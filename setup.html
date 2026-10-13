@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f4f3e8">
+  <title>Set up your semester — NEUron</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <script src="js/storage.js" defer></script>
+  <script src="js/setup.js" defer></script>
+</head>
+<body class="setup-page">
+  <main class="setup-wrap">
+    <a class="brand" href="setup.html" aria-label="NEUron"><span class="brand-mark" aria-hidden="true">n</span><span>neuron<span class="brand-period">.</span></span></a>
+    <div class="setup-progress"><span class="progress-line"><span></span></span><span>01 <span>/</span> 01</span></div>
+    <section class="setup-card">
+      <span class="eyebrow">LET'S GET YOU SETTLED</span>
+      <h1>Start with your<br><em>semester.</em></h1>
+      <p class="muted setup-intro">A few details make this space yours. You can update everything later.</p>
+      <form id="setup-form" class="form-stack">
+        <label for="semester-name">What are you calling this semester?</label>
+        <input id="semester-name" name="semester" required maxlength="80" value="1st Semester 2026–2027" placeholder="e.g. 1st Semester 2026–2027">
+        <label for="subject-names">Which subjects are you taking?</label>
+        <textarea id="subject-names" name="subjects" rows="4" required placeholder="One subject per line&#10;e.g.&#10;Introduction to Computing&#10;College Algebra&#10;Purposive Communication"></textarea>
+        <span class="field-hint">Enter at least one subject, one per line. You can add more later.</span>
+        <p id="setup-error" class="field-error" role="alert" hidden></p>
+        <button class="button button-primary button-wide" type="submit">Create my workspace <span aria-hidden="true">→</span></button>
+      </form>
+      <div class="setup-footnote"><span aria-hidden="true">✳</span> Each subject starts with editable grade categories totaling 100%.</div>
+    </section>
+    <footer class="auth-bottom"><span>NEUron · A calmer way to keep track</span><a href="#" id="setup-signout">Sign out</a></footer>
+  </main>
+</body>
+</html>

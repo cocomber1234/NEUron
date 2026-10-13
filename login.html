@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#194b38">
+  <title>Sign in — NEUron</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <script src="js/storage.js" defer></script>
+  <script src="js/login.js" defer></script>
+</head>
+
+<body class="auth-page">
+  <main class="auth-layout">
+
+    <section class="auth-story" aria-labelledby="story-title">
+      <a class="brand brand-light" href="login.html"><span class="brand-mark" aria-hidden="true">n</span><span>neuron<span class="brand-period">.</span></span></a>
+      <div class="auth-quote">
+        <span class="eyebrow">A LITTLE MORE CLARITY</span>
+        <h1 id="story-title">Your semester,<br><em>in focus.</em></h1>
+        <p>Keep your scores, classes, and progress in one thoughtful place. One small update at a time.</p>
+      </div>
+      <div class="story-note"><span aria-hidden="true">✳</span> Made for the way NEU students learn.</div>
+      <div class="story-decoration story-decoration-one" aria-hidden="true"></div>
+      <div class="story-decoration story-decoration-two" aria-hidden="true"></div>
+    </section>
+
+    <section class="auth-panel" aria-labelledby="login-title">
+      <div class="auth-form-wrap">
+        <span class="eyebrow">WELCOME TO NEURON</span>
+        <h2 id="login-title">Pick up where you are.</h2>
+        <p class="muted">This early version keeps your demo account on this device only.</p>
+        <form id="login-form" class="form-stack">
+          <label for="student-name">Your name</label>
+          <input id="student-name" name="name" autocomplete="name" placeholder="e.g. Alex Santos" required maxlength="80">
+          <label for="student-email">Email address</label>
+          <input id="student-email" name="email" type="email" autocomplete="email" placeholder="you@example.com" required maxlength="160">
+          <p id="login-error" class="field-error" role="alert" hidden></p>
+          <button class="button button-primary button-wide" type="submit">Continue to my semester <span aria-hidden="true">→</span></button>
+        </form>
+        <p class="auth-disclaimer"><span aria-hidden="true">ⓘ</span> Demo sign-in only. No password or real authentication yet.</p>
+      </div>
+      <div class="auth-bottom"><span>NEUron · Grade monitoring for NEU</span><span>Your data stays in this browser</span></div>
+    </section>
+    
+  </main>
+</body>
+</html>
