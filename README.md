@@ -40,24 +40,27 @@ NEUron is a responsive web application that helps college students monitor their
 | Storage (current) | Browser `localStorage` |
 | Backend / Auth / Database (planned) | Firebase (Authentication, Firestore, Hosting) |
 
+## Interface Direction
+
+The interface follows the **Campus Studio** visual direction: warm paper backgrounds, deep campus green, and energetic mint, coral, and marigold accents. Friendly, rounded Nunito typography is used throughout to make the app feel approachable to students while keeping headings and controls easy to scan. The same color, type, and spacing tokens are shared across login, setup, Overview, Subjects, Schedule, and Settings in `css/styles.css`.
+
 ---
 
 ## Project Structure
 
 ```
 neuron/
-├── index.html          # Landing page (activity and score input)
-├── login.html          # Login page
-├── subjects.html       # Subjects with activities and scores
-├── schedule.html       # Weekly schedule
+├── index.html          # Semester overview, score entry, and app navigation
+├── login.html          # Local demo sign-in
+├── setup.html          # First-semester setup
 ├── css/
 │   └── styles.css
 ├── js/
-│   ├── storage.js      # All save/load logic (swap for Firebase later)
-│   ├── grading.js      # Grade computation and 1.0–5.0 conversion
-│   ├── subjects.js
-│   ├── schedule.js
-│   └── reminders.js
+│   ├── storage.js      # All browser storage access
+│   ├── grading.js      # Grade computation and conversion
+│   ├── login.js        # Demo sign-in behavior
+│   ├── setup.js        # Semester setup behavior
+│   └── app.js          # Shared shell and overview/subjects/schedule/settings
 └── README.md
 ```
 
@@ -65,26 +68,21 @@ neuron/
 
 ## Getting Started
 
-1. Clone the repository
-   ```bash
-   git clone https://github.com/<your-username>/neuron.git
-   ```
-2. Open the project folder
-   ```bash
-   cd neuron
-   ```
-3. Open `login.html` (or `index.html`) in your browser. No installation or server needed.
+1. Open `login.html` directly in a browser, or serve the repository with any static web server and open its `login.html`.
+2. Enter a name and email to create or reopen a demo profile on this browser.
+3. Add a semester and your subjects. Then use the Overview, Subjects, Schedule, and Settings pages to keep your semester up to date.
 
-> **Note:** Data is currently saved in your browser's `localStorage`, so it stays on the device you use. The login in this version is for demo purposes only; real authentication comes with the Firebase integration.
+> **Note:** This is a demo app. Data is stored in this browser's `localStorage`; there is no password protection, cloud backup, or real authentication. A subject grade stays “—” until every grading category has at least one score.
 
 ---
 
 ## How Grading Works
 
-1. Each subject has its own **grading system**: a list of categories and their weights (e.g. Quizzes 20%, Exams 40%, Projects 30%, Attendance 10%).
+1. Each subject has its own **grading system**: a list of categories and their weights (new subjects start with editable Quizzes 25%, Exams 40%, Projects 25%, Participation 10%).
 2. Each **activity** belongs to a category and has a score and total items.
 3. NEUron computes the average per category, applies the weights, and gets the subject's percentage.
-4. The percentage is converted to the **1.0–5.0 scale** using the subject's editable conversion table.
+4. The percentage is rounded to a whole number, then converted to the **1.0–5.0 scale** using the editable global conversion table in Settings.
+5. Until each category has at least one score, the subject grade is shown as “—”.
 
 ```
 Percentage = Σ (category average × category weight)

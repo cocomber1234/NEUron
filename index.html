@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f4f3e8">
+  <meta name="description" content="A calm, clear place to keep track of your NEU grades and classes.">
+  <title>NEUron — Your semester, in focus</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <script src="js/storage.js" defer></script>
+  <script src="js/grading.js" defer></script>
+  <script src="js/app.js" defer></script>
+</head>
+<body class="app-page">
+  <div id="app-loading" class="loading-screen" role="status">Opening your semester…</div>
+  <div id="app-shell" class="app-shell" hidden>
+    <aside class="sidebar" aria-label="Main navigation">
+      <a class="brand" href="index.html" aria-label="NEUron home">
+        <span class="brand-mark" aria-hidden="true">n</span>
+        <span>neuron<span class="brand-period">.</span></span>
+      </a>
+      <div class="side-label">YOUR SPACE</div>
+      <nav class="primary-nav" aria-label="Pages">
+        <a href="#home" data-route="home"><span class="nav-icon" aria-hidden="true">⌂</span>Overview</a>
+        <a href="#subjects" data-route="subjects"><span class="nav-icon" aria-hidden="true">▤</span>Subjects</a>
+        <a href="#schedule" data-route="schedule"><span class="nav-icon" aria-hidden="true">▦</span>Schedule</a>
+        <a href="#settings" data-route="settings"><span class="nav-icon" aria-hidden="true">⚙</span>Settings</a>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="semester-card">
+          <span class="semester-dot" aria-hidden="true"></span>
+          <div><span class="eyebrow">IN SESSION</span><strong id="sidebar-semester">Your semester</strong></div>
+        </div>
+        <div class="profile-row">
+          <span class="avatar" id="sidebar-avatar">N</span>
+          <span class="profile-copy"><strong id="sidebar-name">Student</strong><span>NEU student</span></span>
+          <button class="icon-button logout-button" id="logout-button" type="button" aria-label="Sign out" title="Sign out">↗</button>
+        </div>
+      </div>
+    </aside>
+    <main class="main-column">
+      <header class="topbar">
+        <div class="topbar-breadcrumb"><span>MY WORKSPACE</span><span aria-hidden="true">/</span><strong id="page-label">Overview</strong></div>
+        <span class="topbar-date" id="today-label"></span>
+      </header>
+      <div id="notice-region" class="notice-region" aria-live="polite"></div>
+      <section id="page-content" class="page-content" tabindex="-1"></section>
+      <footer class="app-footer"><span>Made for the in-between moments of a semester.</span><span>NEUron <span id="footer-year"></span></span></footer>
+    </main>
+  </div>
+</body>
+</html>
