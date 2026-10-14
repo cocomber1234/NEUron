@@ -1,7 +1,7 @@
 (function () {
   "use strict";
 
-  const WEEKDAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
+  const WEEKDAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
   const ROUTES = ["home", "subjects", "schedule", "settings"];
   const ROUTE_LABELS = { home: "Overview", subjects: "Subjects", schedule: "Schedule", settings: "Settings" };
   let currentUser;
@@ -120,37 +120,69 @@
     }
   }
 
-  function renderSubjectCard(subject) {
+  function renderSubjectCard(subject, isActive) {
     const grade = window.NeuronGrading.calculateSubjectGrade(subject, conversionTable);
     const percentage = window.NeuronGrading.calculateSubjectPercentage(subject);
-    return '<article class="panel subject-card"><div class="subject-card-header"><div><h2>' + escapeHtml(subject.name) + '</h2><p>' + subject.activities.length + ' recorded result' + (subject.activities.length === 1 ? "" : "s") + (percentage === null ? " · Grade appears when all categories have scores" : " · " + percentage + "% overall") + '</p></div><span class="grade-pill ' + (grade === null ? "ungraded" : "") + '">' + formatGrade(grade) + '</span></div><div class="subject-categories">' + subject.categories.map(function (category) {
+    const historyId = "history-" + subject.id;
+    const activityHistory = subject.activities.slice().sort(function (a, b) { return b.date.localeCompare(a.date); });
+    return '<article class="panel subject-card"><div class="subject-card-header"><div><h2>' + escapeHtml(subject.name) + '</h2><p>' + (isActive ? "Current semester · " : "") + subject.activities.length + ' recorded result' + (subject.activities.length === 1 ? "" : "s") + (percentage === null ? " · Grade appears when all categories have scores" : " · " + percentage + "% overall") + '</p></div><span class="grade-pill ' + (grade === null ? "ungraded" : "") + '">' + formatGrade(grade) + '</span></div><div class="subject-categories">' + subject.categories.map(function (category) {
       const average = window.NeuronGrading.calculateCategoryAverage(subject, category.id);
       return '<div class="category-row"><span>' + escapeHtml(category.name) + '</span><span>' + category.weight + '% weight · ' + (average === null ? "No scores" : Math.round(average * 100) + "% average") + '</span></div>';
-    }).join("") + '</div>' + (subject.activities.length ? '<div class="subject-activities">' + subject.activities.slice().sort(function (a, b) { return b.date.localeCompare(a.date); }).slice(0, 3).map(function (activity) {
-      return '<div class="compact-activity"><span>' + escapeHtml(activity.name) + '</span><span>' + activity.score + ' / ' + activity.total + '</span></div>';
-    }).join("") + '</div>' : "") + '<details class="category-edit"><summary>Edit category names and weights</summary><form class="category-edit-form" data-category-form="' + escapeHtml(subject.id) + '">' + subject.categories.map(function (category, index) {
+    }).join("") + '</div><div class="subject-card-actions"><button class="button button-secondary button-small history-toggle" type="button" data-history-toggle="' + escapeHtml(historyId) + '" aria-controls="' + escapeHtml(historyId) + '" aria-expanded="false">History <span aria-hidden="true">(' + subject.activities.length + ')</span></button></div><div class="subject-history" id="' + escapeHtml(historyId) + '" hidden>' + (activityHistory.length ? '<div class="history-list">' + activityHistory.map(function (activity) {
+      const category = subject.categories.find(function (item) { return item.id === activity.categoryId; });
+      return '<div class="history-entry"><div><strong>' + escapeHtml(activity.name) + '</strong><span>' + escapeHtml(category ? category.name : "Activity") + ' · ' + (activity.date ? formatDate(activity.date) : "Date not set") + '</span></div><strong class="history-score">' + activity.score + ' / ' + activity.total + '</strong></div>';
+    }).join("") + '</div>' : '<div class="empty-state"><strong>No scores yet</strong><p>Quizzes, exams, and other activities will appear here.</p></div>') + '</div>' + (isActive ? '<details class="category-edit"><summary>Edit category names and weights</summary><form class="category-edit-form" data-category-form="' + escapeHtml(subject.id) + '">' + subject.categories.map(function (category, index) {
       return '<div class="category-edit-row"><input name="name-' + index + '" aria-label="Category ' + (index + 1) + ' name" required maxlength="40" value="' + escapeHtml(category.name) + '"><input name="weight-' + index + '" aria-label="Category ' + (index + 1) + ' weight percentage" type="number" min="0" max="100" step="any" required value="' + category.weight + '"></div>';
-    }).join("") + '<span class="category-help">Weights must total exactly 100%.</span><button class="button button-secondary button-small" type="submit">Save categories</button></form></details></article>';
+    }).join("") + '<span class="category-help">Weights must total exactly 100%.</span><button class="button button-secondary button-small" type="submit">Save categories</button></form></details>' : "") + '</article>';
+  }
+
+  function renderSemesterSubjectGroup(semester) {
+    const isActive = semester.id === currentSemester.id;
+    const term = semester.term || semester.name || "Previous semester";
+    const addedDate = semester.createdAt ? new Intl.DateTimeFormat(undefined, { month: "short", year: "numeric" }).format(new Date(semester.createdAt)) : "";
+    return '<section class="semester-subject-group" aria-label="' + escapeHtml(term) + (addedDate ? " " + escapeHtml(addedDate) : "") + '"><div class="semester-subject-heading"><h3>' + escapeHtml(term) + (addedDate ? '<span> · ' + escapeHtml(addedDate) + '</span>' : "") + '</h3>' + (isActive ? '<span class="active-semester-label">CURRENT</span>' : '<span class="archived-semester-label">HISTORY</span>') + '</div><div class="subject-grid">' + semester.subjects.map(function (subject) {
+      return renderSubjectCard(subject, isActive);
+    }).join("") + (isActive ? '<section class="panel add-card"><h2>Add a subject</h2><form id="add-subject-form" class="form-stack"><label for="new-subject-name">Subject name</label><input id="new-subject-name" name="name" required maxlength="100" placeholder="e.g. Discrete Mathematics"><span class="category-help">We’ll add the same editable category weights as your other subjects.</span><button class="button button-primary" type="submit">Add subject <span aria-hidden="true">→</span></button></form></section>' : "") + '</div></section>';
   }
 
   function renderSubjects() {
     const content = document.getElementById("page-content");
-    content.innerHTML = '<div class="page-heading"><div><span class="eyebrow">THE DETAILS THAT ADD UP</span><h1>Your <em>subjects.</em></h1><p>See your categories, recorded scores, and what still needs a mark.</p></div></div><div class="subject-grid">' + currentSemester.subjects.map(renderSubjectCard).join("") + '<section class="panel add-card"><h2>Add a subject</h2><form id="add-subject-form" class="form-stack"><label for="new-subject-name">Subject name</label><input id="new-subject-name" name="name" required maxlength="100" placeholder="e.g. Discrete Mathematics"><span class="category-help">We’ll add the same editable category weights as your other subjects.</span><button class="button button-primary" type="submit">Add subject <span aria-hidden="true">→</span></button></form></section></div>';
-    document.getElementById("add-subject-form").addEventListener("submit", async function (event) {
-      event.preventDefault();
-      const form = event.currentTarget;
-      const name = new FormData(form).get("name").trim();
-      if (currentSemester.subjects.some(function (subject) { return subject.name.toLowerCase() === name.toLowerCase(); })) {
-        showNotice("That subject is already in this semester.", true);
-        return;
-      }
-      try {
-        await window.NeuronStorage.addSubject(currentUser.id, currentSemester.id, name);
-        await refreshPage();
-        showNotice("Subject added. You can change its category names and weights below.");
-      } catch (error) {
-        showNotice(error.message, true);
-      }
+    const semesters = currentUser.semesters.slice().sort(function (a, b) {
+      return (b.createdAt || "").localeCompare(a.createdAt || "");
+    });
+    const yearLevels = ["1st Year", "2nd Year", "3rd Year", "4th Year"];
+    const groups = yearLevels.map(function (yearLevel) {
+      const matching = semesters.filter(function (semester) { return semester.yearLevel === yearLevel; });
+      return matching.length ? '<section class="year-subject-group"><h2>' + yearLevel + '</h2>' + matching.map(renderSemesterSubjectGroup).join("") + '</section>' : "";
+    }).join("");
+    const older = semesters.filter(function (semester) { return !yearLevels.includes(semester.yearLevel); });
+    content.innerHTML = '<div class="page-heading"><div><span class="eyebrow">THE DETAILS THAT ADD UP</span><h1>Your <em>subjects.</em></h1><p>Browse subjects by year and semester, or open a subject’s history to see every recorded score.</p></div></div>' + groups + (older.length ? '<section class="year-subject-group"><h2>Previous setup</h2>' + older.map(renderSemesterSubjectGroup).join("") + '</section>' : "");
+    const addSubjectForm = document.getElementById("add-subject-form");
+    if (addSubjectForm) {
+      addSubjectForm.addEventListener("submit", async function (event) {
+        event.preventDefault();
+        const form = event.currentTarget;
+        const name = new FormData(form).get("name").trim();
+        if (currentSemester.subjects.some(function (subject) { return subject.name.toLowerCase() === name.toLowerCase(); })) {
+          showNotice("That subject is already in this semester.", true);
+          return;
+        }
+        try {
+          await window.NeuronStorage.addSubject(currentUser.id, currentSemester.id, name);
+          await refreshPage();
+          showNotice("Subject added. You can change its category names and weights below.");
+        } catch (error) {
+          showNotice(error.message, true);
+        }
+      });
+    }
+    content.querySelectorAll("[data-history-toggle]").forEach(function (button) {
+      button.addEventListener("click", function () {
+        const history = document.getElementById(button.getAttribute("aria-controls"));
+        const expanded = button.getAttribute("aria-expanded") === "true";
+        button.setAttribute("aria-expanded", String(!expanded));
+        history.hidden = expanded;
+      });
     });
     content.querySelectorAll("[data-category-form]").forEach(function (form) {
       form.addEventListener("submit", async function (event) {
@@ -238,7 +270,16 @@
   function renderSettings() {
     const content = document.getElementById("page-content");
     const conversionRows = conversionTable.map(function (row) { return row.minimum + " = " + row.grade.toFixed(2).replace(/0+$/, "").replace(/\.$/, ""); }).join("\n");
+    const currentYearLevel = currentSemester.yearLevel || "1st Year";
+    const currentTerm = currentSemester.term || "1st Semester";
+    const yearLevelOptions = ["1st Year", "2nd Year", "3rd Year", "4th Year"].map(function (yearLevel) {
+      return '<option value="' + yearLevel + '"' + (yearLevel === currentYearLevel ? " selected" : "") + '>' + yearLevel + '</option>';
+    }).join("");
+    const termOptions = ["1st Semester", "2nd Semester", "Summer"].map(function (term) {
+      return '<option value="' + term + '"' + (term === currentTerm ? " selected" : "") + '>' + term + '</option>';
+    }).join("");
     content.innerHTML = '<div class="page-heading"><div><span class="eyebrow">MAKE THIS SPACE YOURS</span><h1>Settings &amp; <em>preferences.</em></h1><p>Your demo profile and the conversion table used for every subject.</p></div></div><div class="settings-grid"><section class="panel settings-panel"><h2>Grade conversion table</h2><p>One threshold per line, written as <code>minimum percentage = NEU grade</code>.</p><form id="conversion-form" class="conversion-form"><label class="field-label" for="conversion-rows">Conversion thresholds</label><textarea id="conversion-rows" class="conversion-textarea" name="rows" required spellcheck="false">' + escapeHtml(conversionRows) + '</textarea><span class="field-hint">Include a 0 threshold. Highest percentages should come first.</span><p id="conversion-error" class="field-error" role="alert" hidden></p><button class="button button-primary" type="submit">Save conversion table</button></form></section><div class="form-stack"><section class="panel settings-panel"><span class="profile-avatar-large" aria-hidden="true">' + escapeHtml(currentUser.name.charAt(0).toUpperCase()) + '</span><h2>Your profile</h2><p>Your name appears in your workspace. This is a demo profile saved on this device.</p><form id="profile-form" class="form-stack"><label for="profile-name">Name</label><input id="profile-name" name="name" required maxlength="80" value="' + escapeHtml(currentUser.name) + '"><label for="profile-email">Email</label><input id="profile-email" value="' + escapeHtml(currentUser.email) + '" disabled><button class="button button-secondary" type="submit">Update name</button></form></section><div class="storage-note"><span aria-hidden="true">ⓘ</span><p>Your information is saved in this browser only. Avoid using sensitive personal information; real cloud accounts aren’t connected yet.</p></div></div></div>';
+    content.insertAdjacentHTML("beforeend", '<section class="panel settings-panel semester-settings"><h2>Start a new semester</h2><p>Your previous semesters and scores stay available in Subjects.</p><form id="semester-form" class="semester-form"><div class="form-pair"><div class="form-stack"><label for="semester-year-level">Year level</label><select id="semester-year-level" name="yearLevel" required>' + yearLevelOptions + '</select></div><div class="form-stack"><label for="semester-term">Semester</label><select id="semester-term" name="term" required>' + termOptions + '</select></div></div><div class="form-stack"><label for="semester-subjects">Subjects in this semester</label><textarea id="semester-subjects" name="subjects" rows="4" required placeholder="One subject per line"></textarea><span class="field-hint">Creating a semester makes it active. Your older records are kept in Subjects.</span></div><p id="semester-error" class="field-error" role="alert" hidden></p><button class="button button-primary" type="submit">Create and switch semester</button></form></section>');
     document.getElementById("conversion-form").addEventListener("submit", async function (event) {
       event.preventDefault();
       const form = event.currentTarget;
@@ -281,6 +322,40 @@
         showNotice("Your profile name has been updated.");
       } catch (error) {
         showNotice(error.message, true);
+      }
+    });
+    document.getElementById("semester-form").addEventListener("submit", async function (event) {
+      event.preventDefault();
+      const form = event.currentTarget;
+      const error = document.getElementById("semester-error");
+      error.hidden = true;
+      const values = new FormData(form);
+      const subjectNames = String(values.get("subjects")).split(/\n/).map(function (name) {
+        return name.trim();
+      }).filter(Boolean);
+      const uniqueNames = Array.from(new Set(subjectNames.map(function (name) {
+        return name.toLowerCase();
+      })));
+      if (!subjectNames.length || uniqueNames.length !== subjectNames.length) {
+        error.textContent = subjectNames.length ? "Each subject should appear only once." : "Add at least one subject for this semester.";
+        error.hidden = false;
+        return;
+      }
+      const submit = form.querySelector('button[type="submit"]');
+      submit.disabled = true;
+      try {
+        const yearLevel = values.get("yearLevel");
+        const term = values.get("term");
+        await window.NeuronStorage.createSemester(currentUser.id, yearLevel + " · " + term, subjectNames, {
+          yearLevel: yearLevel,
+          term: term
+        });
+        await refreshPage();
+        showNotice("New semester created. Your previous semester history is still available in Subjects.");
+      } catch (problem) {
+        error.textContent = problem.message;
+        error.hidden = false;
+        submit.disabled = false;
       }
     });
   }

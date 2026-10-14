@@ -109,7 +109,7 @@
     }) || user.semesters[user.semesters.length - 1] || null;
   }
 
-  async function createSemester(userId, name, subjectNames) {
+  async function createSemester(userId, name, subjectNames, details) {
     const database = await readDatabase();
     const user = database.users.find(function (item) {
       return item.id === userId;
@@ -136,6 +136,8 @@
     const semester = {
       id: await createId(),
       name: name.trim(),
+      yearLevel: details && details.yearLevel ? details.yearLevel : null,
+      term: details && details.term ? details.term : null,
       subjects: subjects,
       createdAt: new Date().toISOString()
     };

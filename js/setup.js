@@ -55,7 +55,12 @@
       submit.disabled = true;
       submit.textContent = "Setting things up…";
       try {
-        await window.NeuronStorage.createSemester(user.id, values.get("semester"), names);
+        const yearLevel = values.get("yearLevel");
+        const term = values.get("term");
+        await window.NeuronStorage.createSemester(user.id, yearLevel + " · " + term, names, {
+          yearLevel: yearLevel,
+          term: term
+        });
         window.location.assign("index.html");
       } catch (problem) {
         error.textContent = problem.message;

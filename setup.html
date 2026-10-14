@@ -18,8 +18,19 @@
       <h1>Start with your<br><em>semester.</em></h1>
       <p class="muted setup-intro">A few details make this space yours. You can update everything later.</p>
       <form id="setup-form" class="form-stack">
-        <label for="semester-name">What are you calling this semester?</label>
-        <input id="semester-name" name="semester" required maxlength="80" value="1st Semester 2026–2027" placeholder="e.g. 1st Semester 2026–2027">
+        <label for="year-level">What year are you in?</label>
+        <select id="year-level" name="yearLevel" required>
+          <option value="1st Year">1st Year</option>
+          <option value="2nd Year">2nd Year</option>
+          <option value="3rd Year">3rd Year</option>
+          <option value="4th Year">4th Year</option>
+        </select>
+        <label for="semester-term">Which semester are you currently in?</label>
+        <select id="semester-term" name="term" required>
+          <option value="1st Semester">1st Semester</option>
+          <option value="2nd Semester">2nd Semester</option>
+          <option value="Summer">Summer</option>
+        </select>
         <label for="subject-names">Which subjects are you taking?</label>
         <textarea id="subject-names" name="subjects" rows="4" required placeholder="One subject per line&#10;e.g.&#10;Introduction to Computing&#10;College Algebra&#10;Purposive Communication"></textarea>
         <span class="field-hint">Enter at least one subject, one per line. You can add more later.</span>
