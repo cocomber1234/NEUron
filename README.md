@@ -12,11 +12,12 @@ NEUron is a responsive web application that helps college students monitor their
 
 - **Login** – personal accounts to access the app
 - **Semester setup** – create a semester and enter the subjects in your curriculum
+- **Year and semester tracking** – label each record by year level and term, and keep prior semesters
 - **Editable grading system per subject** – custom categories (e.g. Quizzes, Exams, Projects) with weights that total 100%, plus an editable percentage-to-grade conversion table
 - **Activity and score tracking** – log scores for quizzes, exams, projects, and more from the landing page
 - **Automatic grade computation** – current grade per subject on the 1.0–5.0 scale
-- **Subjects page** – every subject with its activities and scores in one view
-- **Schedule page** – weekly calendar view of your classes per subject
+- **Subjects page** – browse subjects by year and semester, with full activity and score histories
+- **Schedule page** – weekly calendar view of your classes, including Saturday
 - **Reminders** – get notified about upcoming classes, quizzes, and exams
 - **Responsive design** – works on phones, tablets, and desktops
 
@@ -25,7 +26,6 @@ NEUron is a responsive web application that helps college students monitor their
 - [ ] Target grade calculator ("what do I need to reach 1.75?")
 - [ ] Semester GWA computation
 - [ ] Charts and grade trends
-- [ ] Multi-semester history
 - [ ] Dark mode
 - [ ] Export to PDF/Excel
 - [ ] Cloud sync and real authentication with Firebase
@@ -70,7 +70,7 @@ neuron/
 
 1. Open `login.html` directly in a browser, or serve the repository with any static web server and open its `login.html`.
 2. Enter a name and email to create or reopen a demo profile on this browser.
-3. Add a semester and your subjects. Then use the Overview, Subjects, Schedule, and Settings pages to keep your semester up to date.
+3. Select your year level and current semester, then add your subjects. Use Settings to create a new semester later; earlier subjects and scores remain grouped in Subjects.
 
 > **Note:** This is a demo app. Data is stored in this browser's `localStorage`; there is no password protection, cloud backup, or real authentication. A subject grade stays “—” until every grading category has at least one score.
 
